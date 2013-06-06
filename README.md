@@ -11,6 +11,7 @@ features
 * file upload and sharing
 * desktop notifications
 * oembed support
+* skype emoticons (http://www.messagemagic.net/emoticons.htm)
 
 Missing:
 * chat history
