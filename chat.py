@@ -30,6 +30,7 @@ class Application(tornado.web.Application):
             (r"/", MainHandler),
             (r"/chatsocket", ChatSocketHandler),
             (r"/upload", UploadHandler),
+            (r"/userlist", UserListHandler),
             (r"/auth/login", AuthHandler),
             (r"/auth/logout", LogoutHandler),
         ]
@@ -97,8 +98,14 @@ class MainHandler(UserMixin, tornado.web.RequestHandler):
         self.render("index.html", username=name, messages=ChatSocketHandler.cache)
 
 
+class UserListHandler(UserMixin, tornado.web.RequestHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.write({'users': ChatSocketHandler.waiters.keys()})
+
+
 class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
-    waiters = set()
+    waiters = dict()
     cache = []
     cache_size = 200
 
@@ -107,14 +114,17 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
         return True
 
     def open(self):
-        ChatSocketHandler.waiters.add(self)
         from_user = self.get_current_user()['name']
+        if not from_user in ChatSocketHandler.waiters.keys():
+            ChatSocketHandler.waiters[from_user] = set()
+        ChatSocketHandler.waiters[from_user].add(self)
         logging.info("%s joined the chat", from_user)
         ChatSocketHandler.new_message(from_user, "joined the chat", system=True)
 
     def on_close(self):
-        ChatSocketHandler.waiters.remove(self)
         from_user = self.get_current_user()['name']
+        if from_user in ChatSocketHandler.waiters.keys():
+            ChatSocketHandler.waiters[from_user].remove(self)
         logging.info("%s left the chat", from_user)
         ChatSocketHandler.new_message(from_user, "left the chat", system=True)
 
@@ -126,12 +136,13 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
 
     @classmethod
     def send_updates(cls, chat):
-        logging.info("sending message to %d waiters", len(cls.waiters))
-        for waiter in cls.waiters:
-            try:
-                waiter.write_message(chat)
-            except:
-                logging.error("Error sending message", exc_info=True)
+        logging.info("sending message to %d userwaiters", len(cls.waiters))
+        for userwaiters in cls.waiters.values():
+            for waiter in userwaiters:
+                try:
+                    waiter.write_message(chat)
+                except:
+                    logging.error("Error sending message", exc_info=True)
 
     def on_message(self, message):
         logging.info("got message %r", message)

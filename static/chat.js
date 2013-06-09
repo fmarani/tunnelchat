@@ -62,6 +62,20 @@ function notify(from, msg) {
     }
 }  
 
+function updateUserList() {
+    function refreshList(result) {
+        responseJson = JSON.parse(result.target.response);
+        $("#userlist")[0].innerText = responseJson.users;
+    }
+  var xhr = new XMLHttpRequest();
+
+  /* event listners */
+  xhr.addEventListener("load", refreshList, false);
+  xhr.open("GET", "/userlist");
+  xhr.send();
+}
+    
+
 var updater = {
     socket: null,
 
@@ -80,6 +94,9 @@ var updater = {
         notify(message.from, message.body);
         $("#inbox").append(node);
         $("#inbox").scrollTop($("#inbox")[0].scrollHeight);
+        if (message.system == true) {
+            updateUserList();
+        }
     }
 };
 
