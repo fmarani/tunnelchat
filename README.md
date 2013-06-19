@@ -12,6 +12,7 @@ features
 * desktop notifications
 * oembed support
 * skype emoticons (http://www.messagemagic.net/emoticons.htm)
+* userlist
 
 Missing:
 * chat history
@@ -24,6 +25,5 @@ Missing:
 ideas to test:
 * message pinning (personal)
 * message +1 (shared)
-* userlist
 * @mentions
 * conversation trees
