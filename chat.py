@@ -101,7 +101,8 @@ class MainHandler(UserMixin, tornado.web.RequestHandler):
 class UserListHandler(UserMixin, tornado.web.RequestHandler):
     @tornado.web.authenticated
     def get(self):
-        self.write({'users': ChatSocketHandler.waiters.keys()})
+        from_user = self.get_current_user()['name']
+        self.write({'current_user': from_user, 'users': ChatSocketHandler.waiters.keys()})
 
 
 class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):

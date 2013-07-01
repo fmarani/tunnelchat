@@ -1,16 +1,3 @@
-// Copyright 2009 FriendFeed
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License. You may obtain
-// a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
 
 $(document).ready(function() {
     if (!window.console) window.console = {};
@@ -33,12 +20,12 @@ $(document).ready(function() {
         }
     });
     $("#message").select();
-    updater.start();
+    chat.start();
 });
 
 function newMessage() {
     var message = $("#message");
-    updater.socket.send(message.val());
+    chat.socket.send(message.val());
     message.val("").select();
 }
 
@@ -48,16 +35,18 @@ function notify(from, msg) {
         var havePermission = window.webkitNotifications.checkPermission();
         if (havePermission == 0) {
             // 0 is PERMISSION_ALLOWED
-            var notification = window.webkitNotifications.createNotification(
-            'http://i.stack.imgur.com/dmHl0.png',
-            from,
-            msg
-            );
-            
-            notification.show();
-             setTimeout(function() {
-                 notification.cancel();
-             }, '5000');
+            if (msg.search("@" + chat.current_user) >= 0) {
+                var notification = window.webkitNotifications.createNotification(
+                'http://i.stack.imgur.com/dmHl0.png',
+                from,
+                msg
+                );
+                
+                notification.show();
+                setTimeout(function() {
+                    notification.cancel();
+                }, '5000');
+            }
         } 
     }
 }  
@@ -66,6 +55,8 @@ function updateUserList() {
     function refreshList(result) {
         responseJson = JSON.parse(result.target.response);
         $("#userlist")[0].innerText = responseJson.users;
+        chat.users = responseJson.users;
+        chat.current_user = responseJson.current_user;
     }
   var xhr = new XMLHttpRequest();
 
@@ -76,14 +67,16 @@ function updateUserList() {
 }
     
 
-var updater = {
+var chat = {
     socket: null,
+    users: [],
+    current_user: null,
 
     start: function() {
         var url = "ws://" + location.host + "/chatsocket";
-	updater.socket = new WebSocket(url);
-	updater.socket.onmessage = function(event) {
-	    updater.showMessage(JSON.parse(event.data));
+	chat.socket = new WebSocket(url);
+	chat.socket.onmessage = function(event) {
+	    chat.showMessage(JSON.parse(event.data));
 	}
     },
 
@@ -111,8 +104,6 @@ function uploadProgress(evt) {
   }
 
   function uploadComplete(evt) {
-   // var message = "New file uploaded - " + evt.target.responseText;
-   // updater.socket.send(message);
   }
 
   function uploadFailed(evt) {
