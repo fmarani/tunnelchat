@@ -14,7 +14,9 @@ import urllib
 import json
 import random
 from datetime import datetime
+import time
 import re
+import redis
 
 from tornado.options import define, options
 
@@ -95,7 +97,7 @@ class MainHandler(UserMixin, tornado.web.RequestHandler):
     @tornado.web.authenticated
     def get(self):
         name = tornado.escape.xhtml_escape(self.current_user["name"])
-        self.render("index.html", username=name, messages=ChatSocketHandler.cache)
+        self.render("index.html", username=name, messages=ChatSocketHandler.last_messages())
 
 
 class UserListHandler(UserMixin, tornado.web.RequestHandler):
@@ -107,8 +109,9 @@ class UserListHandler(UserMixin, tornado.web.RequestHandler):
 
 class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
     waiters = dict()
-    cache = []
-    cache_size = 200
+    CHAT_STORAGE = "chat"
+    redis = redis.StrictRedis()
+    cache_size = 30
 
     def allow_draft76(self):
         # for iOS 5.0 Safari
@@ -131,9 +134,7 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
 
     @classmethod
     def update_cache(cls, chat):
-        cls.cache.append(chat)
-        if len(cls.cache) > cls.cache_size:
-            cls.cache = cls.cache[-cls.cache_size:]
+        cls.redis.zadd(cls.CHAT_STORAGE, time.time(), json.dumps(chat))
 
     @classmethod
     def send_updates(cls, chat):
@@ -149,6 +150,12 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
         logging.info("got message %r", message)
         from_user = self.get_current_user()['name']
         ChatSocketHandler.new_message(from_user, message)
+
+    @classmethod
+    def last_messages(cls):
+        """get last messages"""
+        for msg in cls.redis.zrange(cls.CHAT_STORAGE, -cls.cache_size, -1):
+            yield json.loads(msg)
 
     @classmethod
     def new_message(cls, from_user, body, system=False):
