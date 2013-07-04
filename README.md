@@ -13,17 +13,20 @@ features
 * oembed support
 * skype emoticons (http://www.messagemagic.net/emoticons.htm)
 * userlist
+* @mentions
 
 Missing:
+* long messages truncation
 * chat history
 * message search
 * uploaded file preview
 * mobile client
 * api
 * webhooks
+* code posting
+* xmpp compatibility
 
 ideas to test:
 * message pinning (personal)
 * message +1 (shared)
-* @mentions
 * conversation trees
