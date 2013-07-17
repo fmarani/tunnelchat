@@ -4,6 +4,12 @@ tunnelchat
 Let's just say IM implementations generally suck. Client/Server architectures are hard ground for quick iterations, and web is ubiquitous, let's use that. I really like Hipchat, so this is a clone of it, for now.
 
 
+code
+----
+
+Hey yes i hear you, all the code is in one file... and also no unit-tests. Ugly! Expect exploding code for now.
+
+
 features
 --------
 
@@ -15,18 +21,25 @@ features
 * userlist
 * @mentions
 
-Missing:
+Todo:
 * long messages truncation
 * chat history
 * message search
+* docker packaging and deployment
+* user status
+* slash commands
 * uploaded file preview
 * mobile client
 * api
-* webhooks
+* github pubsubhubbub subscription for commits, issues, comments and pull requests
+http://developer.github.com/v3/repos/hooks/#pubsubhubbub
+
+
 * code posting
-* xmpp compatibility
+* xmpp compatibility with xhtml visualization
 
 ideas to test:
 * message pinning (personal)
 * message +1 (shared)
 * conversation trees
+* hubot integration
