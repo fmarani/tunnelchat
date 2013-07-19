@@ -25,7 +25,6 @@ Todo:
 * long messages truncation
 * chat history
 * message search
-* docker packaging and deployment
 * user status
 * slash commands
 * uploaded file preview
@@ -43,3 +42,21 @@ ideas to test:
 * message +1 (shared)
 * conversation trees
 * hubot integration
+
+
+install
+-------
+
+Using docker:
+
+    cd into the project
+    docker build -t chat .
+    docker run -i -t chat 
+
+
+Normal way:
+
+    apt-get install redis-server
+    mkvirtualenv tunnelchat
+    pip install -r requirements.txt
+    python chat.py
