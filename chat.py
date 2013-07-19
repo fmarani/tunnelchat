@@ -110,7 +110,7 @@ class UserListHandler(UserMixin, tornado.web.RequestHandler):
 class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
     waiters = dict()
     CHAT_STORAGE = "chat"
-    redis = redis.StrictRedis()
+    redis = redis.StrictRedis('127.0.0.1', 6379)
     cache_size = 30
 
     def allow_draft76(self):
@@ -457,4 +457,5 @@ def main():
 
 
 if __name__ == "__main__":
+    logging.info("Starting Tunnelchat...")
     main()
