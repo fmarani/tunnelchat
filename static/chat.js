@@ -2,7 +2,8 @@
 $(document).ready(function() {
     if (!window.console) window.console = {};
     if (!window.console.log) window.console.log = function() {};
-
+    $(window).resize(adjustBoxSizes);
+    adjustBoxSizes();
     $("#messageform").on("submit", function() {
         newMessage();
         if (window.webkitNotifications) {
@@ -22,6 +23,12 @@ $(document).ready(function() {
     $("#message").select();
     chat.start();
 });
+
+function adjustBoxSizes() {
+      $('#inbox').height($(window).height() - 60);
+      $('#userlist').height($(window).height() - 60);
+      $('#inbox').width($(window).width() - 110);
+}
 
 function newMessage() {
     var message = $("#message");

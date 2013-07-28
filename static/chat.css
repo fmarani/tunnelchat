@@ -39,25 +39,25 @@
     display: inline;
 }
 
-      /* Wrapper for page content to push down footer */
       #inbox {
         width: 1200px; 
         height: 600px;
-        /* Negative indent footer by it's height */
         overflow-y: scroll;
+        display: inline-block;
       }
 
-      /* Set the fixed height of the footer here */
-      #footer {
-          position: fixed;
-          bottom: 0;
-        height: 120px;
-        width: 100%;
-      }
-      #footer {
-        background-color: #f5f5f5;
-      }
+#userlist {
+  width: 100px;
+  height: 600px;
+  overflow-y: scroll; 
+  display: inline-block;
+}
 
-
-
-
+#footer {
+  height: 60px;
+  width: 100%;
+  display: inline-block;
+}
+#footer form {
+  display: inline-block;
+}
