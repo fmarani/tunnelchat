@@ -31,6 +31,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/", MainHandler),
             (r"/chatsocket", ChatSocketHandler),
+            (r"/messages", MessageHandler),
             (r"/upload", UploadHandler),
             (r"/userlist", UserListHandler),
             (r"/auth/login", AuthHandler),
@@ -106,6 +107,10 @@ class UserListHandler(UserMixin, tornado.web.RequestHandler):
         from_user = self.get_current_user()['name']
         self.write({'current_user': from_user, 'users': ChatSocketHandler.waiters.keys()})
 
+class MessageHandler(UserMixin, tornado.web.RequestHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.write(json.dumps(list(ChatSocketHandler.last_messages())))
 
 class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
     waiters = dict()
