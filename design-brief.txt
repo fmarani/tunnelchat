@@ -1,0 +1,32 @@
+The brand is "TunnelChat", it's an opensource chat web app, similar to HipChat/Campfire/Slack. Difference is that it is Opensource, everybody can install and use it from their server. I believe communication is so important we should not have closed source systems responsible for this. I also want this to be an excellent open source project. Benefits of this system over XMPP, Skype or similar are all the things that makes Hipchat better for teams (persistent rooms, file sharing, API integration, etc)
+
+The audience is for all creative people, but starting mainly for developers. I want this to be a open platform on which they can build any sort of thing. The message I want to convey is of a system that is easy to use when hosted but customizable for your own needs, especially when self-hosted. The key values i want to communicate is quirkyness, secure and complete openness. I want the look to be light, white being the predominant colour.
+
+I want the design to transmit the idea it is easy to try it and push people to do it, I also want to emphasize the opensource element. As i said, I like light colors and a lot of white in the design, i like the common theme that many makers movement websites have, but also
+
+http://www.chartjs.org/
+http://bitters.bourbon.io/
+http://bourbon.io/
+http://www.resumablejs.com/
+http://makezine.com/2013/05/30/crowdfunding-if-at-first-you-dont-succeed/
+http://123d.circuits.io/
+http://dribbble.com/shots/986709-Twitter-Client?list=show&tag=open_source
+http://trulia.github.io/hologram/
+
+I tend to prefer blue but i like this color scheme:
+http://dribbble.com/shots/1187186-Seriously-Open?list=show&tag=open_source
+
+
+The pages the project needs are:
+
+- logo and brand identity
+- icon
+- styleguide
+
+- homepage
+- chat application page + any animation if needed
+- chat app is composed by: main window. tabbed view on the right with userlist, file uploaded list, links list. popup flyout with emoticons list. chat room switcher (either left or top or bottom)
+- registration page (or login with Github
+- about page (or generic content page)
+
+If front-end code can be supplied it would be super. Not required though. I am very open to suggestions if anything written here causes concerns.
