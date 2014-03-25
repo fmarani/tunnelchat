@@ -43,3 +43,9 @@
 #footer form {
   display: inline-block;
 }
+
+.me {
+    font-weight: bold;
+}
+.other {
+}

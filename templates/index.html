@@ -7,35 +7,41 @@
 <link rel="stylesheet" href="{{ static_url("chat.css") }}" type="text/css"/>
 </head>
 <body>
-<div id="wrap">
+<div chat-app ng-cloak>
     <div id="inbox">
-        {% for message in messages %}
-        {% include "message.html" %}
-        {% end %}
+      <div class="message" ng-repeat="message in ctrl.messages" ng-click="ctrl.selectMessage(message)">
+          <div class="when">
+              {{! message.when }}
+          </div>
+          <div class="author">
+              {{! message.from }}
+          </div>
+          <div class="msgtext" ng-bind-html="message.body">
+          </div>
+      </div>
     </div>
     <div id="userlist">
-        User list
+        <ul>
+            <li ng-repeat="user in ctrl.users" ng-class="user.css()">{{! user.name }}</li>
+        </ul>
     </div>
     <div id="footer">
         <div id="input">
-            <form method="post" id="messageform">
-                <textarea name="body" id="message"></textarea>
-                <input type="submit" value="{{ _("Post") }}"/>
-                <input type="hidden" name="next" value="{{ request.path }}"/>
-                {% module xsrf_form_html() %}
-            </form>
-            <form id="form1" action="/upload" enctype="multipart/form-data" method="post">
-                {% module xsrf_form_html() %}
-                <input type="file" name="file" id="file" />
-                <input type="submit" value="Upload" />
-                <div id="progressNumber"></div>
-            </div>
+                <textarea name="body" id="message" ng-model="ctrl.in_progress_msg" ng-enter-submit submit="ctrl.addMessage()"></textarea>
+                <button type="submit" ng-click="ctrl.addMessage()">send</button>
+
+                <input type="file" id="file" name="file" />
+                <div id="progress-bar">0%</div>
+                
         </div>
     </div>
+    
+  
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" type="text/javascript"></script>
     <script>!window.jQuery && document.write(unescape('%3Cscript src="{{ static_url("js/jquery.min.js") }}"%3E%3C/script%3E'))</script>
     <script src="{{ static_url("js/bootstrap.js") }}" type="text/javascript"></script>
-    <script src="{{ static_url("chat.js") }}" type="text/javascript"></script>
+    <script type="application/dart" src="{{ static_url("main.dart") }}"></script>
+    <script type="text/javascript" src="{{ static_url("packages/browser/dart.js") }}"></script>
 </div>
 </body>
 </html>
