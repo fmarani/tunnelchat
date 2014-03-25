@@ -53,20 +53,18 @@ class UserMixin(object):
         return tornado.escape.json_decode(user_json)
 
 class UploadHandler(UserMixin, tornado.web.RequestHandler):
-    @tornado.web.authenticated
     def post(self):
-        file1 = self.request.files['file'][0]
-        original_fname = file1['filename']
+        data = json.loads(self.request.body)
+        base64_content = data['data'].split(",")[1]
+        original_fname = data['filename']
         prefix = self.current_user['name']
         final_filename= prefix + " - " + original_fname
         output_file = open("static/uploads/" + final_filename, 'w')
-        output_file.write(file1['body'])
+        output_file.write(base64_content.decode("base64"))
 
         upload_msg = tornado.escape.to_basestring(
             loader.load("upload.html").generate(final_filename=final_filename))
         ChatSocketHandler.new_message(self.current_user['name'], upload_msg, system=True)
-
-        self.finish(final_filename)
 
 
 class AuthHandler(UserMixin, tornado.web.RequestHandler, tornado.auth.GoogleMixin):
@@ -173,8 +171,6 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
             "body": body,
             "system": system,
             }
-        chat["html"] = tornado.escape.to_basestring(
-            loader.load("message.html").generate(message=chat))
 
         ChatSocketHandler.update_cache(chat)
         ChatSocketHandler.send_updates(chat)

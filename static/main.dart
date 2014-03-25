@@ -60,7 +60,7 @@ class MainController {
     messages = [];
     users = [];
     ws.onOpen.listen((e) {
-      updateUserList();  
+      //updateUserList();  
     });
     ws.onMessage.listen((MessageEvent e) {
         var event = JSON.decode(e.data);
@@ -104,6 +104,8 @@ class MainController {
       .then((HttpResponse response) {
         for (String username in response.data['users']) {
           var me = false;
+          print(response.data['current_user']);
+          print(username);
           if (response.data['current_user'] == username) {
             me = true;
           }
