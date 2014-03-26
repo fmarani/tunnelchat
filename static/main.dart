@@ -2,9 +2,11 @@ import 'package:angular/angular.dart';
 import 'dart:html';
 import 'dart:convert';
 
-
-// Temporary, please follow https://github.com/angular/angular.dart/issues/476
-@MirrorsUsed(override: '*')
+@MirrorsUsed(targets: const[
+    Message,
+    User
+],
+override: '*')
 import 'dart:mirrors';
 
 WebSocket ws;
@@ -104,8 +106,6 @@ class MainController {
       .then((HttpResponse response) {
         for (String username in response.data['users']) {
           var me = false;
-          print(response.data['current_user']);
-          print(username);
           if (response.data['current_user'] == username) {
             me = true;
           }
