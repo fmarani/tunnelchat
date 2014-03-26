@@ -1,4 +1,6 @@
-The brand is "TunnelChat", it's an opensource chat web app, similar to HipChat/Campfire/Slack. Difference is that it is Opensource, everybody can install and use it from their server. I believe communication is so important we should not have closed source systems responsible for this. I also want this to be an excellent open source project. Benefits of this system over XMPP, Skype or similar are all the things that makes Hipchat better for teams (persistent rooms, file sharing, API integration, etc)
+"TunnelChat"
+---
+it's an opensource chat web app, similar to HipChat/Campfire/Slack. Difference is that it is Opensource, everybody can install and use it from their server. I believe communication is so important we should not have closed source systems responsible for this. I also want this to be an excellent open source project. Benefits of this system over XMPP, Skype or similar are all the things that makes Hipchat better for teams (persistent rooms, file sharing, API integration, etc)
 
 The audience is for all creative people, but starting mainly for developers. I want this to be a open platform on which they can build any sort of thing. The message I want to convey is of a system that is easy to use when hosted but customizable for your own needs, especially when self-hosted. The key values i want to communicate is quirkyness, secure and complete openness. I want the look to be light, white being the predominant colour.
 
