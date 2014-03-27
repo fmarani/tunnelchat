@@ -15,13 +15,13 @@ features
 
 * google auth login
 * file upload and sharing
-* desktop notifications
 * oembed support
 * skype emoticons (http://www.messagemagic.net/emoticons.htm)
 * userlist
-* @mentions
 
 Todo:
+* desktop notifications
+* @mentions
 * long messages truncation
 * chat history
 * message search
