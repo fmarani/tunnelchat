@@ -23,6 +23,7 @@ from tornado.options import define, options
 from tornado import gen
 
 define("port", default=8888, help="run on the given port", type=int)
+define("redis", default="127.0.0.1:6379", help="redis server address")
 
 loader = tornado.template.Loader(os.path.join(os.path.dirname(__file__), "templates"))
 
@@ -112,7 +113,8 @@ class MessageHandler(UserMixin, tornado.web.RequestHandler):
 class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
     waiters = dict()
     CHAT_STORAGE = "chat"
-    redis = redis.StrictRedis('127.0.0.1', 6379)
+    host, port = options.redis.split(":")
+    redis = redis.StrictRedis(host, int(port))
     cache_size = 30
 
     def allow_draft76(self):
