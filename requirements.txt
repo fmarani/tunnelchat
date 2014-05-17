@@ -1,2 +1,2 @@
 tornado==3.0.1
-redis==2.7.6
+toredis==0.1.2

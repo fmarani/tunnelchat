@@ -22,6 +22,7 @@ features
 Todo:
 * desktop notifications
 * @mentions
+* activity leds (and time away)
 * long messages truncation
 * chat history
 * message search
