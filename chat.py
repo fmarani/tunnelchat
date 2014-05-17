@@ -16,7 +16,7 @@ import random
 from datetime import datetime
 import time
 import re
-import redis
+from toredis import Client
 
 from tornado.options import define, options
 
@@ -32,8 +32,8 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/", MainHandler),
             (r"/chatsocket", ChatSocketHandler),
-            (r"/messages", MessageHandler),
             (r"/upload", UploadHandler),
+            (r"/messages", MessageHandler),
             (r"/userlist", UserListHandler),
             (r"/auth/login", AuthHandler),
             (r"/auth/logout", LogoutHandler),
@@ -96,77 +96,120 @@ class MainHandler(UserMixin, tornado.web.RequestHandler):
     @tornado.web.authenticated
     def get(self):
         name = tornado.escape.xhtml_escape(self.current_user["name"])
-        self.render("index.html", username=name, messages=ChatSocketHandler.last_messages())
+        self.render("index.html", username=name)
 
 
 class UserListHandler(UserMixin, tornado.web.RequestHandler):
     @tornado.web.authenticated
+    @tornado.web.asynchronous
     def get(self):
+        ChatSocketHandler.current_users("chat", callback=self.on_userlist)
+
+    def on_userlist(self, response):
+        logging.info("%s are the current users", response)
         from_user = self.get_current_user()['name']
-        self.write({'current_user': from_user, 'users': ChatSocketHandler.waiters.keys()})
+        self.write({'current_user': from_user, 'users': response})
+        self.finish()
 
 class MessageHandler(UserMixin, tornado.web.RequestHandler):
     @tornado.web.authenticated
+    @tornado.web.asynchronous
     def get(self):
-        self.write(json.dumps(list(ChatSocketHandler.last_messages())))
+        ChatSocketHandler.last_messages("chat", callback=self.on_lastmessages)
+
+    def on_lastmessages(self, response):
+        logging.info("%s are the last messages", response)
+        # lists are not automatically converted to json
+        self.write(json.dumps(response))
+        self.finish()
+
+def chat_userset_key(chat_channel):
+    """return key for userset"""
+    return chat_channel + "_users"
+
+def chat_lastmessages_key(chat_channel):
+    """return key for userset"""
+    return chat_channel + "_lastmessages"
 
 class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
-    waiters = dict()
-    CHAT_STORAGE = "chat"
-    host, port = options.redis.split(":")
-    redis = redis.StrictRedis(host, int(port))
     cache_size = 30
-
-    def allow_draft76(self):
-        # for iOS 5.0 Safari
-        return True
+    commands_client = Client()
+    pub_client = Client()
 
     def open(self):
+        # FIXME: make chat_channel dynamic
+        self.chat_channel = "chat"
+
+        self.chat_userset = chat_userset_key(self.chat_channel)
         from_user = self.get_current_user()['name']
-        if not from_user in ChatSocketHandler.waiters.keys():
-            ChatSocketHandler.waiters[from_user] = set()
-        ChatSocketHandler.waiters[from_user].add(self)
+
+        host, port = options.redis.split(":")
+        self.sub_client = Client()
+        self.sub_client.connect(host, int(port))
+
+        # first add entered user in user_set, then subscribe to notifications
+        def sadd_finished(resp):
+            self.sub_client.subscribe(self.chat_channel, callback=self.on_redis_message)
+        self.sub_client.sadd(self.chat_userset, from_user, callback=sadd_finished)
+
         logging.info("%s joined the chat", from_user)
-        ChatSocketHandler.new_message(from_user, "joined the chat", system=True)
+        ChatSocketHandler.send_message(self.chat_channel, from_user, "joined the chat", system=True)
+
+    def on_redis_message(self, msg):
+        msg_type, msg_channel, msg = msg
+        if msg_type == b"message":
+            # write message back to websocket
+            self.write_message(json.loads(msg.decode()))
 
     def on_close(self):
         from_user = self.get_current_user()['name']
-        if from_user in ChatSocketHandler.waiters.keys():
-            ChatSocketHandler.waiters[from_user].remove(self)
         logging.info("%s left the chat", from_user)
-        ChatSocketHandler.new_message(from_user, "left the chat", system=True)
 
-    @classmethod
-    def update_cache(cls, chat):
-        cls.redis.zadd(cls.CHAT_STORAGE, time.time(), json.dumps(chat))
-
-    @classmethod
-    def send_updates(cls, chat):
-        logging.info("sending message to %d userwaiters", len(cls.waiters))
-        for userwaiters in cls.waiters.values():
-            for waiter in userwaiters:
-                try:
-                    waiter.write_message(chat)
-                except:
-                    logging.error("Error sending message", exc_info=True)
+        self.sub_client.srem(self.chat_userset, from_user)
+        ChatSocketHandler.send_message(self.chat_channel, from_user, "left the chat", system=True)
 
     def on_message(self, message):
         logging.info("got message %r", message)
         from_user = self.get_current_user()['name']
-        ChatSocketHandler.new_message(from_user, message)
+        ChatSocketHandler.send_message(self.chat_channel, from_user, message)
 
     @classmethod
-    def last_messages(cls):
+    def update_lastmessages(cls, chat_channel, chat):
+        cls.pub_client.lpush(chat_lastmessages_key(chat_channel), json.dumps(chat))
+        cls.pub_client.ltrim(chat_lastmessages_key(chat_channel), 0, cls.cache_size)
+
+    @classmethod
+    def last_messages(cls, chat_channel, callback):
         """get last messages"""
-        for msg in cls.redis.zrange(cls.CHAT_STORAGE, -cls.cache_size, -1):
-            yield json.loads(msg)
+        if not cls.commands_client.is_connected():
+            host, port = options.redis.split(":")
+            cls.commands_client.connect(host, int(port))
+
+        def transform(response):
+            logging.info("last messages are: %s", response)
+            json_resp = [json.loads(x) for x in response]
+            callback(json_resp[::-1])
+
+        cls.commands_client.lrange(chat_lastmessages_key(chat_channel), 0, cls.cache_size, callback=transform)
 
     @classmethod
-    def new_message(cls, from_user, body, system=False):
+    def current_users(cls, chat_channel, callback):
+        """get last messages"""
+        if not cls.commands_client.is_connected():
+            host, port = options.redis.split(":")
+            cls.commands_client.connect(host, int(port))
+        cls.commands_client.smembers(chat_userset_key(chat_channel), callback)
+
+    @classmethod
+    def send_message(cls, chat_channel, from_user, body, system=False):
+        if not cls.pub_client.is_connected():
+            host, port = options.redis.split(":")
+            cls.pub_client.connect(host, int(port))
+
         if not system:
             body = message_beautify(body)
 
-        chat = {
+        chat_msg = {
             "id": str(uuid.uuid4()),
             "from": from_user,
             "when": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -174,8 +217,8 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
             "system": system,
             }
 
-        ChatSocketHandler.update_cache(chat)
-        ChatSocketHandler.send_updates(chat)
+        cls.update_lastmessages(chat_channel, chat_msg)
+        cls.pub_client.publish(chat_channel, json.dumps(chat_msg))
 
 
 OEMBED_HINTS = {
@@ -445,7 +488,7 @@ def message_beautify(body):
 
 def timed_bot():
     body = urllib.urlopen("http://www.iheartquotes.com/api/v1/random").read()
-    ChatSocketHandler.new_message("The Bot", body)
+    ChatSocketHandler.send_message("chat", "The Bot", body)
 
 def main():
     interval_ms = 15 * 60 * 1000
