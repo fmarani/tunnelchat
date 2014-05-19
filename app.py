@@ -6,7 +6,8 @@ from tornado.options import options
 from tornado.web import Application
 import urllib
 
-from handlers.common import MainHandler, MessageHandler, UserListHandler, AuthHandler, LogoutHandler
+from handlers.common import MainHandler, MessageHandler, UserListHandler
+from handlers.auth import AuthHandler, LogoutHandler, GoogleAuthHandler
 from handlers.upload import UploadHandler
 from handlers.chat import ChatSocketHandler
 
@@ -21,6 +22,7 @@ class TunnelChat(Application):
             (r"/messages", MessageHandler),
             (r"/userlist", UserListHandler),
             (r"/auth/login", AuthHandler),
+            (r"/auth/login/google", GoogleAuthHandler),
             (r"/auth/logout", LogoutHandler),
             (r'/media/(.*)', tornado.web.StaticFileHandler, {'path': 'media/'}),
         ]
