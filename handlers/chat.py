@@ -108,6 +108,7 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
             }
 
         cls.update_lastmessages(chat_channel, chat_msg)
+        logging.debug("Broadcasting message %s", chat_msg)
         cls.pub_client.publish(chat_channel, json.dumps(chat_msg))
 
 

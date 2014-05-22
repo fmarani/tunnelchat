@@ -37,7 +37,7 @@ class AuthHandler(UserMixin, tornado.web.RequestHandler):
             self.set_secure_cookie("chat_user", tornado.escape.json_encode(user))
             self.redirect("/")
         else:
-            error_msg = u"?error=" + tornado.escape.url_escape("Login incorrect.")
+            error_msg = "?error=" + tornado.escape.url_escape("Login incorrect.")
             self.redirect("/auth/login" + error_msg)
 
 
