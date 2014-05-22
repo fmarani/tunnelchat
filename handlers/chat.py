@@ -30,7 +30,7 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
         self.chat_channel = "chat"
 
         self.chat_userset = chat_userset_key(self.chat_channel)
-        from_user = self.get_current_user()['name']
+        self.from_user = self.get_current_user()['name']
 
         host, port = options.redis.split(":")
         self.sub_client = Client()
@@ -40,10 +40,10 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
         # first add entered user in user_set, then subscribe to notifications
         def sadd_finished(resp):
             self.sub_client.subscribe(self.chat_channel, callback=self.on_redis_message)
-        self.sub_client.sadd(self.chat_userset, from_user, callback=sadd_finished)
+        self.sub_client.sadd(self.chat_userset, self.from_user, callback=sadd_finished)
 
-        logging.info("%s joined the chat", from_user)
-        ChatSocketHandler.send_message(self.chat_channel, from_user, "joined the chat", system=True)
+        logging.info("%s joined the chat", self.from_user)
+        ChatSocketHandler.send_message(self.chat_channel, self.from_user, "joined the chat", system=True)
 
     def on_redis_message(self, msg):
         msg_type, msg_channel, msg = msg
@@ -52,16 +52,14 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
             self.write_message(json.loads(msg.decode()))
 
     def on_close(self):
-        from_user = self.get_current_user()['name']
-        logging.info("%s left the chat", from_user)
+        logging.info("%s left the chat", self.from_user)
 
-        self.sub_client.srem(self.chat_userset, from_user)
-        ChatSocketHandler.send_message(self.chat_channel, from_user, "left the chat", system=True)
+        self.sub_client.srem(self.chat_userset, self.from_user)
+        ChatSocketHandler.send_message(self.chat_channel, self.from_user, "left the chat", system=True)
 
     def on_message(self, message):
         logging.info("got message %r", message)
-        from_user = self.get_current_user()['name']
-        ChatSocketHandler.send_message(self.chat_channel, from_user, message)
+        ChatSocketHandler.send_message(self.chat_channel, self.from_user, message)
 
     @classmethod
     def update_lastmessages(cls, chat_channel, chat):
