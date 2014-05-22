@@ -6,12 +6,12 @@ from tornado.options import options
 from tornado.web import Application
 import urllib.request, urllib.parse, urllib.error
 
-from .handlers.common import MainHandler, MessageHandler, UserListHandler
-from .handlers.auth import AuthHandler, LogoutHandler, GoogleAuthHandler
-from .handlers.upload import UploadHandler
-from .handlers.chat import ChatSocketHandler
+from handlers.common import MainHandler, MessageHandler, UserListHandler
+from handlers.auth import AuthHandler, LogoutHandler, GoogleAuthHandler
+from handlers.upload import UploadHandler
+from handlers.chat import ChatSocketHandler
 
-from .settings import settings
+from settings import settings
 
 class TunnelChat(Application):
     def __init__(self):
