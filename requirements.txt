@@ -1,2 +1,2 @@
-tornado==3.0.1
-toredis==0.1.2
+tornado==3.2.1
+toredis-fork==0.1.3
