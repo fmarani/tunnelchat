@@ -35,7 +35,7 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
         host, port = options.redis.split(":")
         self.sub_client = Client()
         self.sub_client.connect(host, int(port))
-        logging.debug("Opened subscribe connection to redis")
+        logging.debug("Opened subscribe connection to redis for user=%s", self.from_user)
 
         # first add entered user in user_set, then subscribe to notifications
         def sadd_finished(resp):
@@ -47,6 +47,7 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
 
     def on_redis_message(self, msg):
         msg_type, msg_channel, msg = msg
+        logging.debug("Got message from Redis: type=%s, channel=%s, msg=%s", msg_type, msg_channel, msg)
         if msg_type == b"message":
             # write message back to websocket
             self.write_message(json.loads(msg.decode()))
