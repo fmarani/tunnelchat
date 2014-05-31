@@ -4,7 +4,8 @@ import unittest
 
 TEST_MODULES = [
     'test_home',
-    'test_chat'
+    'test_chat_messaging',
+    'test_chat_operations'
 ]
 
 def all():

@@ -76,7 +76,7 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
             logging.debug("Opened commands connection to redis")
 
         def transform(response):
-            json_resp = [json.loads(x) for x in response]
+            json_resp = [json.loads(x.decode("utf8")) for x in response]
             callback(json_resp[::-1])
 
         cls.commands_client.lrange(chat_lastmessages_key(chat_channel), 0, cls.cache_size, callback=transform)
@@ -88,7 +88,12 @@ class ChatSocketHandler(UserMixin, tornado.websocket.WebSocketHandler):
             host, port = options.redis.split(":")
             cls.commands_client.connect(host, int(port))
             logging.debug("Opened commands connection to redis")
-        cls.commands_client.smembers(chat_userset_key(chat_channel), callback)
+
+        def transform(response):
+            json_resp = [x.decode("utf8") for x in response]
+            callback(json_resp)
+
+        cls.commands_client.smembers(chat_userset_key(chat_channel), callback=transform)
 
     @classmethod
     def send_message(cls, chat_channel, from_user, body, system=False):
