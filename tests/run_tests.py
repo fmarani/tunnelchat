@@ -4,6 +4,7 @@ import unittest
 
 TEST_MODULES = [
     'test_home',
+    'test_upload',
     'test_chat_messaging',
     'test_chat_operations'
 ]

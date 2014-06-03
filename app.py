@@ -11,7 +11,7 @@ from handlers.auth import AuthHandler, LogoutHandler, GoogleAuthHandler
 from handlers.upload import UploadHandler
 from handlers.chat import ChatSocketHandler
 
-from settings import settings
+import settings
 
 class TunnelChat(Application):
     def __init__(self):
@@ -24,9 +24,9 @@ class TunnelChat(Application):
             (r"/auth/login", AuthHandler),
             (r"/auth/login/google", GoogleAuthHandler),
             (r"/auth/logout", LogoutHandler),
-            (r'/media/(.*)', tornado.web.StaticFileHandler, {'path': 'media/'}),
+            (r'/media/(.*)', tornado.web.StaticFileHandler, {'path': settings.MEDIA_ROOT}),
         ]
-        Application.__init__(self, handlers, **settings)
+        Application.__init__(self, handlers, **settings.tornado_settings)
 
 
 def timed_bot():
