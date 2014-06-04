@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block container %}
-<div chat-app ng-cloak>
+<div id="chat-app" chat-app ng-cloak>
     <div id="inbox">
       <div class="message" ng-repeat="message in ctrl.messages" ng-click="ctrl.selectMessage(message)">
           <div class="when">
@@ -30,11 +30,8 @@
         </div>
     </div>
     
-  
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" type="text/javascript"></script>
-    <script>!window.jQuery && document.write(unescape('%3Cscript src="{{ static_url("js/jquery.min.js") }}"%3E%3C/script%3E'))</script>
-    <script src="{{ static_url("js/bootstrap.js") }}" type="text/javascript"></script>
     <script type="application/dart" src="{{ static_url("main.dart") }}"></script>
     <script type="text/javascript" src="{{ static_url("packages/browser/dart.js") }}"></script>
+  
 </div>
 {% end %}

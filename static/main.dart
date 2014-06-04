@@ -72,22 +72,11 @@ class MainController {
         querySelector("#inbox").scrollByLines(1);
         
     });
-    adjustBoxSizes();
-    window.onResize.listen((e) {
-      adjustBoxSizes();
-    });
         
     
     
   }
   
-  void adjustBoxSizes() {
-        var height = window.innerHeight - 60;
-        querySelector('#inbox').style.height = "${height}px";
-        querySelector('#userlist').style.height = "${height}px";
-        var width = window.innerWidth - 130;
-        querySelector('#inbox').style.width = "${width}px";
-  }
   
   void selectMessage(Message msg) {
     selectedMessage = msg;
