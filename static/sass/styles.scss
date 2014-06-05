@@ -5,7 +5,6 @@
 
 // customizations
 
-$chat-window-width: 1200px;
 $user-window-width: 100px;
 $messagebar-window-height: 60px;
 
@@ -17,10 +16,6 @@ html, body, #chat-app {
 
 #chat-app {
     padding: 5px;
-}
-
-#input {
-  margin-top: 0.5em;
 }
 
 #inbox {
@@ -51,7 +46,7 @@ html, body, #chat-app {
   }
 }
 
-#userlist {
+#users {
   width: $user-window-width;
   height: calc(100% - #{$messagebar-window-height} - 20px);
   overflow-y: scroll; 
@@ -61,10 +56,16 @@ html, body, #chat-app {
 #footer {
   height: $messagebar-window-height;
   width: 100%;
-  display: inline-block;
 }
-#footer form {
-  display: inline-block;
+
+#userlist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#file {
+    display: inline;
 }
 
 .me {

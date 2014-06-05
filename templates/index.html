@@ -14,20 +14,19 @@
           </div>
       </div>
     </div>
-    <div id="userlist">
-        <ul>
+    <div id="users">
+        <ul id="userlist">
             <li ng-repeat="user in ctrl.users" ng-class="user.css()">{{! user.name }}</li>
         </ul>
     </div>
     <div id="footer">
-        <div id="input">
-                <textarea name="body" id="message" ng-model="ctrl.in_progress_msg" ng-enter-submit submit="ctrl.addMessage()"></textarea>
-                <button type="submit" ng-click="ctrl.addMessage()">send</button>
-
-                <input type="file" id="file" name="file" />
-                <div id="progress-bar">0%</div>
-                
-        </div>
+                <form class="form-inline">
+                    <textarea name="body" id="message" ng-model="ctrl.in_progress_msg" ng-enter-submit submit="ctrl.addMessage()"></textarea>
+                    <button type="submit" class="btn btn-primary" ng-click="ctrl.addMessage()">send</button>
+    
+                    <input type="file" id="file" name="file" />
+                    <span id="progress-bar">0%</span>
+                </form>
     </div>
     
     <script type="application/dart" src="{{ static_url("main.dart") }}"></script>
