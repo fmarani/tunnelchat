@@ -13,6 +13,10 @@ from handlers.chat import ChatSocketHandler
 
 import settings
 
+import os, os.path
+from tornado import autoreload
+
+
 class TunnelChat(Application):
     def __init__(self):
         handlers = [
@@ -27,6 +31,14 @@ class TunnelChat(Application):
             (r'/media/(.*)', tornado.web.StaticFileHandler, {'path': settings.MEDIA_ROOT}),
         ]
         Application.__init__(self, handlers, **settings.tornado_settings)
+        self.intialize_watcher()
+
+    def intialize_watcher(self):
+        self.watched_dirs = ["static/css", "static/js"]
+        if self.settings.get('debug'):
+            for wdir in self.watched_dirs:
+                for filename in os.listdir(wdir):
+                    autoreload.watch(os.path.abspath(os.path.join(wdir, filename)))
 
 
 def timed_bot():
