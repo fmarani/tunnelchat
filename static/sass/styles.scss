@@ -49,7 +49,7 @@ html, body, #chat-app {
 #users {
   width: $user-window-width;
   height: calc(100% - #{$messagebar-window-height} - 20px);
-  overflow-y: scroll; 
+  overflow-y: auto; 
   display: inline-block;
 }
 
@@ -70,6 +70,8 @@ html, body, #chat-app {
 
 .me {
     font-weight: bold;
+    padding: 2px;
 }
 .other {
+    padding: 2px;
 }
