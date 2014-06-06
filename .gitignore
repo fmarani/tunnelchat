@@ -26,3 +26,4 @@ pubspec.lock
 
 # sass
 .sass-cache/
+css/
