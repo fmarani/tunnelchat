@@ -23,6 +23,7 @@ nosetests.xml
 # dart
 packages/
 pubspec.lock
+*.dart*js*
 
 # sass
 .sass-cache/
