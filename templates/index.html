@@ -21,11 +21,15 @@
     </div>
     <div id="footer">
                 <form class="form-inline">
-                    <textarea name="body" id="message" ng-model="ctrl.in_progress_msg" ng-enter-submit submit="ctrl.addMessage()"></textarea>
-                    <button type="submit" class="btn btn-primary" ng-click="ctrl.addMessage()">send</button>
+                    <div class="form-group">
+                        <textarea name="body" id="message" class="form-control input-lg" ng-model="ctrl.in_progress_msg" ng-enter-submit submit="ctrl.addMessage()"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-lg" ng-click="ctrl.addMessage()">send</button>
     
-                    <input type="file" id="file" name="file" />
-                    <span id="progress-bar">0%</span>
+                    <div class="form-group">
+                        <input type="file" id="file" name="file" />
+                        <span id="progress-bar">0%</span>
+                    </div>
                 </form>
     </div>
     
