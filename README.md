@@ -52,12 +52,12 @@ Using docker:
 
     cd into the project
     docker build -t chat .
-    docker run -i -t chat 
+    docker run -p 2111:8888 -i -t chat  # change 2111 with your external port
 
 
 Normal way:
 
     apt-get install redis-server
-    mkvirtualenv tunnelchat
+    mkvirtualenv --python=/usr/bin/python3 tunnelchat
     pip install -r requirements.txt
-    python chat.py
+    python app.py
