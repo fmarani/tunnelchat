@@ -1,3 +1,6 @@
+clean:
+	rm -fr css main.dart.js main.dart.js.map main.dart.js.deps
+
 css:
 	compass compile
 
